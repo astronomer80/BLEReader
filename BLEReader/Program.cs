@@ -188,7 +188,7 @@ namespace BLEReader
                 try
                 {
                     //DFUService dfs =DFUService.Instance;
-                    UARTService.Instance.connectToDeviceAsync(device);
+                    UARTService.Instance.connectToDeviceAsync2(device);
                 }
                 catch (Exception e)
                 {
@@ -204,9 +204,10 @@ namespace BLEReader
 
         #region Properties
         private static GattDeviceService service { get; set; }
-        private GattCharacteristic controlPoint { get; set; }
+        private GattCharacteristic txCharacteristic { get; set; }
+        private GattCharacteristic rxCharacteristic { get; set; }
+
         private GattDescriptor cccd { get; set; }
-        private bool IsServiceChanged = false;
         public bool IsServiceInitialized { get; set; }
 
         //UUID to identify the DFU service
@@ -231,12 +232,7 @@ namespace BLEReader
             get { return service; }
         }
 
-        async void ConnectDevice(DeviceInformation deviceInfo)
-        {
-            // Note: BluetoothLEDevice.FromIdAsync must be called from a UI thread because it may prompt for consent.
-            BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(deviceInfo.Id);
-            // ...
-        }
+        
         /// <summary>
         /// Connect to the device, check if there's the DFU Service and start the firmware update
         /// </summary>
@@ -284,13 +280,13 @@ namespace BLEReader
                                     if (characteristic.Uuid.ToString() == UARTCharacteristics_UUID_RX)
                                     {
                                         Console.WriteLine("UARTService_UUID_RX found " + characteristic.UserDescription);
-                                        this.controlPoint = characteristic;
+                                        this.rxCharacteristic = characteristic;
                                     }
 
                                     if (characteristic.Uuid.ToString() == UARTCharacteristics_UUID_TX)
                                     {
                                         Console.WriteLine("UARTService_UUID_TX found " + characteristic.UserDescription);
-                                        this.controlPoint = characteristic;
+                                        this.txCharacteristic = characteristic;
                                     }
 
 
@@ -313,7 +309,9 @@ namespace BLEReader
                                 }     
                             }
 
-                            this.startReaderAsync();
+                            this.startReaderAsync(this.txCharacteristic);
+                            this.startReaderAsync(this.rxCharacteristic);
+
                             break;
                         }
                     }
@@ -330,13 +328,87 @@ namespace BLEReader
             }
         }
 
-        private async void startReaderAsync()
+        /// <summary>
+        /// Connect to the device, check if there's the DFU Service and start the firmware update
+        /// </summary>
+        /// <param name="device">The device discovered</param>
+        /// <returns></returns>
+        public async void connectToDeviceAsync2(DeviceInformation device)
         {
-            GattCharacteristicProperties properties = this.controlPoint.CharacteristicProperties;
+            try
+            {
+                var deviceAddress = "N/A";
+                if (device.Id.Contains("-"))
+                    deviceAddress = device.Id.Split('-')[1];
+
+                Console.WriteLine("Connecting to:" + deviceAddress + "...");
+
+                BluetoothLEDevice bluetoothLeDevice = await BluetoothLEDevice.FromIdAsync(device.Id);
+                Console.WriteLine("Name:" + bluetoothLeDevice);
+
+                //Perform the connection to the device
+                var result = await bluetoothLeDevice.GetGattServicesAsync();
+                if (result.Status == GattCommunicationStatus.Success)
+                {
+                    Console.WriteLine("Device " + deviceAddress + " connected. Updating firmware...");
+                    //Scan the available services
+                    var services = result.Services;
+                    foreach (var service_ in services)
+                    {
+                        Console.WriteLine("Service " + service_.Uuid);
+                        //If DFUService found...
+                        if (service_.Uuid == new Guid(UARTService.UARTService_UUID))
+                        { //NRF52 DFU Service
+                            Console.WriteLine("UART Service found");
+
+                            var stCharacteristic = service_.GetCharacteristics(new Guid(UARTService.UARTCharacteristics_UUID_TX))[0];
+                            await stCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                            stCharacteristic.ValueChanged += Characteristic_ValueChangedTest;
+
+                            this.startReaderAsync(this.txCharacteristic);
+                            this.startReaderAsync(this.rxCharacteristic);
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Status error: " + result.Status.ToString() + " need to restarte the device");
+
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("ERROR: Accessing2 your device failed." + Environment.NewLine + e.Message + "\n" + e.StackTrace);
+            }
+        }
+
+        private async void startReaderAsync(GattCharacteristic characteristic)
+        {
+            GattCharacteristicProperties properties = characteristic.CharacteristicProperties;
 
             if (properties.HasFlag(GattCharacteristicProperties.Read))
             {
                 Console.WriteLine("This characteristic supports reading from it.");
+
+                while (true)
+                {
+                    GattReadResult result = await this.txCharacteristic.ReadValueAsync();
+                    if (result.Status == GattCommunicationStatus.Success)
+                    {
+                        /*
+                        byte[] value = new byte[result.Value.Length];
+                        DataReader.FromBuffer(result.Value).ReadBytes(value);
+                        Console.WriteLine(value.ToString());
+                        */
+                        DataReader dataReader = Windows.Storage.Streams.DataReader.FromBuffer(result.Value);
+                        dataReader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                        string text = dataReader.ReadString(result.Value.Length);
+                        Console.WriteLine(text);
+                    }
+                    Thread.Sleep(1000);
+                }
             }
             if (properties.HasFlag(GattCharacteristicProperties.Write))
             {
@@ -345,26 +417,30 @@ namespace BLEReader
             if (properties.HasFlag(GattCharacteristicProperties.Notify))
             {
                 Console.WriteLine("This characteristic supports subscribing to notifications.");
-            }
 
-            GattCommunicationStatus status = await this.controlPoint.WriteClientCharacteristicConfigurationDescriptorAsync(
+                GattCommunicationStatus status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
                         GattClientCharacteristicConfigurationDescriptorValue.Notify);
-            if (status == GattCommunicationStatus.Success)
-            {
-                Console.WriteLine("Success");
-                this.controlPoint.ValueChanged += Characteristic_ValueChanged;
-                // ... 
-
-                void Characteristic_ValueChanged(GattCharacteristic sender,
-                                                    GattValueChangedEventArgs args)
+                if (status == GattCommunicationStatus.Success)
                 {
-                    Console.WriteLine("Characteristic_ValueChanged");
-
-                    // An Indicate or Notify reported that the value has changed.
-                    var reader = DataReader.FromBuffer(args.CharacteristicValue);
-                    Console.WriteLine("Read:" + reader.ReadString(10));
-}
+                    Console.WriteLine("Success");
+                    characteristic.ValueChanged += Characteristic_ValueChangedTest;
+                    // ... 
+                    
+                    
+                }
             }
+
+            
+        }
+
+        void Characteristic_ValueChangedTest(GattCharacteristic sender,
+                                                    GattValueChangedEventArgs args)
+        {
+            Console.WriteLine("Characteristic_ValueChanged " + sender.Uuid);
+
+            // An Indicate or Notify reported that the value has changed.
+            var reader = DataReader.FromBuffer(args.CharacteristicValue);
+            Console.WriteLine("Read:" + reader.ReadString(10));
         }
     }
 }
