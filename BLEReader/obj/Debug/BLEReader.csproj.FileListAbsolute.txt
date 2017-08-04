@@ -1,0 +1,9 @@
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\bin\Debug\BLEReader.exe.config
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\bin\Debug\BLEReader.exe
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\bin\Debug\BLEReader.pdb
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\bin\Debug\System.Runtime.WindowsRuntime.dll
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\bin\Debug\Windows.winmd
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\bin\Debug\System.Runtime.WindowsRuntime.xml
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\obj\Debug\BLEReader.csprojResolveAssemblyReference.cache
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\obj\Debug\BLEReader.exe
+C:\Users\aferr\Documents\Visual Studio 2017\Projects\BLEReader\BLEReader\obj\Debug\BLEReader.pdb
