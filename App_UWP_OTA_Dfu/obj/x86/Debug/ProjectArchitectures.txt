@@ -1,0 +1,1 @@
+E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\App_UWP_BLEReader.csproj;x86
