@@ -28,13 +28,13 @@
     <AppXManifest Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-08-16T11:35:23.731</Modified>
+      <Modified>2017-08-17T18:55:02.024</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Debug\App_UWP_OTA_Dfu.exe">
       <PackagePath>entrypoint\App_UWP_OTA_Dfu.exe</PackagePath>
-      <Modified>2017-08-16T11:35:19.923</Modified>
+      <Modified>2017-08-17T18:54:59.032</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\ferra\.nuget\packages\Microsoft.CSharp\4.0.0\lib\netcore50\Microsoft.CSharp.dll">
       <PackagePath>Microsoft.CSharp.dll</PackagePath>
@@ -496,11 +496,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2017-08-16T11:29:45.335</Modified>
+      <Modified>2017-08-17T12:34:17.243</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Debug\Core\App_UWP_OTA_Dfu.exe">
       <PackagePath>App_UWP_OTA_Dfu.exe</PackagePath>
-      <Modified>2017-08-16T11:35:23.706</Modified>
+      <Modified>2017-08-17T18:55:02.000</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

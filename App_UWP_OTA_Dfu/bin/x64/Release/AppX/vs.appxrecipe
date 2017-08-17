@@ -28,21 +28,21 @@
     <AppXManifest Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Release\ilc\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-08-16T12:09:14.117</Modified>
+      <Modified>2017-08-17T13:00:59.044</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Release\ilc\App_UWP_OTA_Dfu.dll">
       <PackagePath>App_UWP_OTA_Dfu.dll</PackagePath>
-      <Modified>2017-08-16T12:09:13.682</Modified>
+      <Modified>2017-08-17T13:00:58.543</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Release\ilc\App_UWP_OTA_Dfu.exe">
       <PackagePath>App_UWP_OTA_Dfu.exe</PackagePath>
-      <Modified>2017-08-16T12:09:14.051</Modified>
+      <Modified>2017-08-17T13:00:58.958</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Release\ilc\App_UWP_OTA_Dfu.pdb">
       <PackagePath>App_UWP_OTA_Dfu.pdb</PackagePath>
-      <Modified>2017-08-16T12:09:14.048</Modified>
+      <Modified>2017-08-17T13:00:58.953</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Release\ilc\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
@@ -84,7 +84,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="E:\Primo\App_UWP_BLEReader\App_UWP_OTA_Dfu\bin\x64\Release\ilc\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2017-08-16T11:54:05.524</Modified>
+      <Modified>2017-08-17T12:51:55.937</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

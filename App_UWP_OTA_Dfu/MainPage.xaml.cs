@@ -1,25 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using System.Threading;
+
 using System.ComponentModel;
-using System.Text;
+using Windows.UI.Core;
 
 // Il modello di elemento per la pagina vuota è documentato all'indirizzo http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x410
 
@@ -34,24 +25,23 @@ namespace App_UWP_OTA_Dfu
     {
         String textLog = "";
         String logfilename = "";
-        private BackgroundWorker backgroundWorker1;
+        String version = "0.1";
+        String app_name = "Arduino OTA_DFU for Nordic nRF5x";
+        bool scanonly, devicefound;
+        //String given_device_address = "cc:32:24:e9:13:1a";
+        String given_device_address = "e8:53:c7:3c:fc:e8";
+        private static GattDeviceService service { get; set; }
 
 
         public MainPage()
         {
             this.InitializeComponent();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.backgroundWorker1.ProgressChanged += WorkerThread_ProgressChanged;
-            this.backgroundWorker1.DoWork += WorkerThread_DoWork;
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.RunWorkerCompleted += this.backgroundWorker1_RunWorkerCompleted;
-
-            this.backgroundWorker1.RunWorkerAsync();
             String time = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             this.logfilename = @"[" + time + "]_" + app_name + "_LOG.txt";
             log(app_name);
             discovery();
+
+           
 
             //UARTService.Instance.connectToDeviceAsync3();
         }
@@ -63,16 +53,16 @@ namespace App_UWP_OTA_Dfu
 
         private void WorkerThread_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+
+            this.textBox.Text = this.textLog;
             Debug.WriteLine("WorkerThread_ProgressChanged " + e.UserState.ToString());
 
         }
 
-        private void textBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        async void log2(String message)
         {
-
+            Debug.WriteLine(message);
         }
-
-        
 
         async void log(String message)
         {
@@ -80,19 +70,26 @@ namespace App_UWP_OTA_Dfu
             try
             {
                 this.textLog = this.textLog + "\n" + message;
-
                 this.writeOnFile(message);
-                
 
-                while (this.backgroundWorker1.IsBusy) {
-                    var b = 0;
+                try
+                {
+                    Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                    () =>{
+                        this.textBox.Text = this.textLog;
+                    });                    
+                    
                 }
-                this.backgroundWorker1.RunWorkerAsync();
-                this.backgroundWorker1.ReportProgress(0, this.textLog);
+                catch (Exception e1)
+                {
+                    Debug.WriteLine("[log5]" + e1.Message + " " + e1.StackTrace);
+
+                }
+
             }
             catch (Exception e)
             {
-                Debug.WriteLine("[log]" + e.Message + " " + e.StackTrace);
+                Debug.WriteLine("[log1]" + e.Message + " " + e.StackTrace);
             }
         }
 
@@ -103,9 +100,8 @@ namespace App_UWP_OTA_Dfu
                 // Create sample file; replace if exists.
                 Windows.Storage.StorageFolder storageFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
                 Windows.Storage.StorageFile sampleFile = await storageFolder.CreateFileAsync(logfilename, Windows.Storage.CreationCollisionOption.OpenIfExists);
-
-                //await Windows.Storage.FileIO.WriteTextAsync(sampleFile, data);
-                await Windows.Storage.FileIO.AppendTextAsync(sampleFile, message);
+                                
+                await Windows.Storage.FileIO.AppendTextAsync(sampleFile, message+"\n");
             }catch(Exception e)
             {
                 Debug.WriteLine("[log]" + e.Message + " " + e.StackTrace);
@@ -116,20 +112,9 @@ namespace App_UWP_OTA_Dfu
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.textBox.Text = this.textLog;
-            Debug.WriteLine("[backgroundWorker1_RunWorkerCompleted]");
+            
+
         }
-
-
-
-
-
-        String version = "0.1";
-        String app_name = "Arduino OTA_DFU for Nordic nRF5x";
-        bool scanonly, devicefound;
-        //String given_device_address = "cc:32:24:e9:13:1a";
-        String given_device_address = "e8:53:c7:3c:fc:e8";
-        private static GattDeviceService service { get; set; }
 
         /// <summary>
         /// Discovery BLE devices in range
@@ -180,22 +165,22 @@ namespace App_UWP_OTA_Dfu
 
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            log("DeviceWatcher_Updated");
+            log2("DeviceWatcher_Updated");
         }
 
         private void DeviceWatcher_Stopped(DeviceWatcher sender, object args)
         {
-            log("DeviceWatcher_Stopped");
+            log2("DeviceWatcher_Stopped");
         }
 
         private void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object args)
         {
-            log("DeviceWatcher_EnumerationCompleted");
+            log2("DeviceWatcher_EnumerationCompleted");
         }
 
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            log("DeviceWatcher_Removed");
+            log2("DeviceWatcher_Removed");
         }
 
         /// <summary>
@@ -216,7 +201,7 @@ namespace App_UWP_OTA_Dfu
             {
                 //this.devicefound = true;
                 try
-                {
+                {                    
                     //DFUService dfs =DFUService.Instance;
                     var uARTService = UARTService.Instance;
                     uARTService.setMain(this);
@@ -267,7 +252,7 @@ namespace App_UWP_OTA_Dfu
             void log(String message)
             {
                 //Debug.WriteLine(message);
-                this.mainPage.log(message);
+                this.mainPage.log("[App] "+message);
              
             }
 

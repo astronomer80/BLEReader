@@ -12,7 +12,7 @@
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBox x:ConnectionId='1' x:Name="textBox" Grid.ColumnSpan="2" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Height="640" Width="360"/>
+        <TextBox x:ConnectionId='1' x:Name="textBox"  Grid.ColumnSpan="2" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Height="640" Width="360"/>
 
     </Grid>
 </Page>
